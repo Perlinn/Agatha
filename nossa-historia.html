@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="theme-color" content="#0a0a0a">
+<title>E + A — Nossa História</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #c9a96e;
+    --gold-light: #e8d5b0;
+    --gold-dim: rgba(201,169,110,0.15);
+    --bg: #080808;
+    --bg2: #0f0f0f;
+    --white: #f5f0e8;
+    --white-dim: rgba(245,240,232,0.6);
+    --white-faint: rgba(245,240,232,0.08);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--white);
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    overflow-x: hidden;
+  }
+
+  #particles {
+    position: fixed; top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none; z-index: 0; opacity: 0.4;
+  }
+
+  #progress-bar {
+    position: fixed; top: 0; left: 0;
+    height: 1.5px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    z-index: 1000; width: 0%;
+  }
+
+  /* ─── YOUTUBE HIDDEN ─── */
+  #yt-container {
+    position: fixed; bottom: -9999px; left: -9999px;
+    width: 1px; height: 1px; overflow: hidden; z-index: -1;
+  }
+
+  /* ─── MUSIC BTN ─── */
+  #music-btn {
+    position: fixed; bottom: 28px; right: 20px; z-index: 500;
+    width: 48px; height: 48px; border-radius: 50%;
+    border: 1px solid rgba(201,169,110,0.4);
+    background: rgba(8,8,8,0.85);
+    backdrop-filter: blur(12px);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    transition: border-color 0.3s ease, transform 0.3s ease;
+    opacity: 0; animation: fadeIn 1s ease 3.5s forwards;
+  }
+  #music-btn:hover { border-color: var(--gold); transform: scale(1.08); }
+  #music-btn svg { width: 18px; height: 18px; fill: var(--gold); }
+
+  .ring {
+    position: absolute; inset: -4px; border-radius: 50%;
+    border: 1px solid transparent; border-top-color: var(--gold);
+    animation: spin 3s linear infinite; display: none;
+  }
+  #music-btn.playing .ring { display: block; }
+  #music-btn.playing { border-color: rgba(201,169,110,0.12); }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .music-label {
+    position: fixed; bottom: 84px; right: 16px; z-index: 499;
+    font-size: 10px; letter-spacing: 0.3em; color: var(--gold);
+    text-transform: uppercase; opacity: 0; pointer-events: none;
+    writing-mode: vertical-rl; transform: rotate(180deg);
+    transition: opacity 0.4s ease;
+  }
+  .music-label.show { opacity: 0.6; }
+
+  /* ─── SECTIONS ─── */
+  section { position: relative; z-index: 1; padding: 100px 24px; max-width: 680px; margin: 0 auto; }
+
+  #hero {
+    min-height: 100svh; display: flex; flex-direction: column;
+    justify-content: center; align-items: center; text-align: center;
+    max-width: 100%; padding: 40px 32px;
+  }
+
+  .hero-eyebrow {
+    font-size: 11px; letter-spacing: 0.45em; color: var(--gold);
+    text-transform: uppercase; opacity: 0; animation: fadeUp 1s ease 0.5s forwards; margin-bottom: 36px;
+  }
+
+  .hero-monogram {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(80px, 22vw, 160px); font-weight: 400; line-height: 1;
+    color: transparent; -webkit-text-stroke: 1px var(--gold-light);
+    opacity: 0; animation: fadeUp 1.2s ease 0.9s forwards;
+  }
+
+  .hero-amp { color: var(--gold); -webkit-text-stroke: 0; font-style: italic; font-size: 0.7em; vertical-align: middle; }
+
+  .hero-divider {
+    width: 1px; height: 60px;
+    background: linear-gradient(to bottom, transparent, var(--gold), transparent);
+    margin: 40px auto; opacity: 0; animation: fadeIn 1s ease 1.6s forwards;
+  }
+
+  .hero-tagline {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(20px, 5.5vw, 34px); font-weight: 400; font-style: italic;
+    line-height: 1.4; opacity: 0; animation: fadeUp 1.2s ease 1.8s forwards; max-width: 520px;
+  }
+  .hero-tagline em { color: var(--gold); }
+
+  .hero-date {
+    font-size: 12px; letter-spacing: 0.3em; color: var(--white-dim);
+    text-transform: uppercase; margin-top: 40px;
+    opacity: 0; animation: fadeUp 1s ease 2.2s forwards;
+  }
+
+  .hero-music-cta {
+    margin-top: 44px; opacity: 0; animation: fadeUp 1s ease 2.6s forwards;
+    display: flex; flex-direction: column; align-items: center; gap: 14px; cursor: pointer;
+    transition: opacity 0.4s ease, transform 0.4s ease;
+  }
+  .hero-music-cta.hidden { opacity: 0 !important; transform: scale(0.9); pointer-events: none; }
+
+  .play-circle {
+    width: 56px; height: 56px; border-radius: 50%;
+    border: 1px solid rgba(201,169,110,0.5);
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.4s ease; position: relative; overflow: hidden;
+  }
+  .play-circle::before {
+    content: ''; position: absolute; inset: 0; border-radius: 50%;
+    background: var(--gold); opacity: 0; transition: opacity 0.4s ease;
+  }
+  .hero-music-cta:hover .play-circle::before { opacity: 0.12; }
+  .hero-music-cta:hover .play-circle { border-color: var(--gold); }
+  .play-circle svg { width: 20px; height: 20px; fill: var(--gold); margin-left: 3px; position: relative; z-index: 1; }
+  .play-label { font-size: 10px; letter-spacing: 0.4em; color: var(--gold); text-transform: uppercase; opacity: 0.7; }
+
+  .scroll-hint {
+    position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%);
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    opacity: 0; animation: fadeIn 1s ease 3.2s forwards;
+  }
+  .scroll-hint span { font-size: 10px; letter-spacing: 0.4em; color: var(--gold); text-transform: uppercase; }
+  .scroll-line { width: 1px; height: 48px; background: linear-gradient(to bottom, var(--gold), transparent); animation: scrollPulse 2s ease-in-out infinite; }
+
+  /* ─── ELEMENTS ─── */
+  .section-label { font-size: 10px; letter-spacing: 0.5em; color: var(--gold); text-transform: uppercase; margin-bottom: 20px; display: block; }
+  .section-title { font-family: 'Playfair Display', serif; font-size: clamp(32px, 8vw, 52px); font-weight: 400; line-height: 1.15; margin-bottom: 32px; }
+  .section-title em { font-style: italic; color: var(--gold); }
+  .section-body { font-size: clamp(17px, 4vw, 20px); line-height: 1.85; color: var(--white-dim); font-weight: 300; }
+  .section-body strong { color: var(--white); font-weight: 600; }
+  .section-body em { font-style: italic; color: var(--gold-light); }
+  .gold-rule { width: 48px; height: 1px; background: var(--gold); margin: 40px 0; }
+
+  /* ─── REVEAL ─── */
+  .reveal { opacity: 0; transform: translateY(32px); transition: opacity 0.9s ease, transform 0.9s ease; }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+  .reveal-delay-1 { transition-delay: 0.15s; }
+  .reveal-delay-2 { transition-delay: 0.3s; }
+  .reveal-delay-3 { transition-delay: 0.45s; }
+  .reveal-delay-4 { transition-delay: 0.6s; }
+
+  /* ─── TIMELINE ─── */
+  #timeline { max-width: 100%; padding: 80px 0; background: linear-gradient(to bottom, var(--bg), var(--bg2), var(--bg)); }
+  .timeline-inner { max-width: 680px; margin: 0 auto; padding: 0 24px; }
+  .timeline-track { position: relative; margin-top: 60px; }
+  .timeline-track::before {
+    content: ''; position: absolute; left: 24px; top: 0; bottom: 0; width: 1px;
+    background: linear-gradient(to bottom, transparent, var(--gold-dim) 20%, var(--gold-dim) 80%, transparent);
+  }
+  .tl-item { display: flex; align-items: flex-start; gap: 32px; padding: 0 0 64px 0; opacity: 0; transform: translateX(-24px); transition: opacity 0.8s ease, transform 0.8s ease; }
+  .tl-item.visible { opacity: 1; transform: translateX(0); }
+  .tl-dot-wrap { flex-shrink: 0; width: 48px; display: flex; justify-content: center; padding-top: 4px; }
+  .tl-dot { width: 10px; height: 10px; border-radius: 50%; border: 1.5px solid var(--gold); background: var(--bg); box-shadow: 0 0 12px var(--gold-dim); transition: all 0.3s ease; }
+  .tl-item.visible .tl-dot { background: var(--gold); box-shadow: 0 0 20px rgba(201,169,110,0.5); }
+  .tl-content { flex: 1; }
+  .tl-date { font-size: 10px; letter-spacing: 0.4em; color: var(--gold); text-transform: uppercase; margin-bottom: 10px; }
+  .tl-title { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 400; margin-bottom: 12px; line-height: 1.3; }
+  .tl-text { font-size: 16px; line-height: 1.8; color: var(--white-dim); font-weight: 300; }
+  .tl-text em { color: var(--gold-light); font-style: italic; }
+
+  /* ─── STATS ─── */
+  #stats { text-align: center; background: var(--bg2); max-width: 100%; padding: 80px 24px; border-top: 1px solid var(--white-faint); border-bottom: 1px solid var(--white-faint); }
+  .stats-inner { max-width: 680px; margin: 0 auto; }
+  .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; margin-top: 48px; }
+  .stat-card { padding: 40px 16px; border: 1px solid var(--white-faint); position: relative; overflow: hidden; }
+  .stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, var(--gold), transparent); opacity: 0; transition: opacity 0.5s ease; }
+  .stat-card.visible::before { opacity: 1; }
+  .stat-number { font-family: 'Playfair Display', serif; font-size: clamp(28px, 7vw, 48px); font-weight: 400; color: var(--gold); line-height: 1; display: block; }
+  .stat-label { font-size: 10px; letter-spacing: 0.3em; color: var(--white-dim); text-transform: uppercase; margin-top: 10px; display: block; }
+
+  /* ─── EMOTIONAL ─── */
+  .pull-quote {
+    font-family: 'Playfair Display', serif; font-size: clamp(22px, 5.5vw, 34px);
+    font-style: italic; font-weight: 400; line-height: 1.5; color: var(--white);
+    padding: 40px 0; border-top: 1px solid var(--gold-dim); border-bottom: 1px solid var(--gold-dim); margin: 48px 0;
+  }
+  .pull-quote em { color: var(--gold); }
+
+  /* ─── FUTURE ─── */
+  #future { max-width: 100%; padding: 100px 24px; background: linear-gradient(180deg, var(--bg) 0%, #0d0b08 100%); }
+  .future-inner { max-width: 680px; margin: 0 auto; }
+  .future-scene {
+    margin-top: 60px; padding: 48px 32px;
+    border: 1px solid rgba(201,169,110,0.2); position: relative;
+    background: linear-gradient(135deg, rgba(201,169,110,0.03), transparent);
+  }
+  .future-scene::before { content: ''; position: absolute; top: -1px; left: 40px; right: 40px; height: 1px; background: linear-gradient(90deg, transparent, var(--gold), transparent); }
+  .future-scene::after { content: ''; position: absolute; bottom: -1px; left: 40px; right: 40px; height: 1px; background: linear-gradient(90deg, transparent, var(--gold), transparent); }
+  .future-scene p { font-size: clamp(17px, 4vw, 21px); line-height: 1.9; font-weight: 300; color: var(--white-dim); margin-bottom: 20px; }
+  .future-scene p:last-child { margin-bottom: 0; }
+  .future-scene strong { color: var(--white); font-weight: 600; }
+  .future-scene em { color: var(--gold-light); font-style: italic; }
+  .future-note { text-align: center; margin-top: 60px; font-family: 'Playfair Display', serif; font-size: clamp(20px, 5vw, 28px); font-style: italic; color: var(--white-dim); line-height: 1.6; }
+  .future-note em { color: var(--gold); }
+
+  /* ─── EASTER ─── */
+  #easter-trigger { text-align: center; padding: 60px 24px; cursor: pointer; user-select: none; position: relative; z-index: 1; }
+  .easter-symbol { font-size: 32px; display: inline-block; color: var(--gold); opacity: 0.3; transition: opacity 0.3s ease, transform 0.3s ease; font-family: 'Playfair Display', serif; }
+  .easter-hint { font-size: 11px; letter-spacing: 0.3em; color: rgba(245,240,232,0.15); text-transform: uppercase; margin-top: 12px; display: block; }
+  .easter-msg { display: none; font-family: 'Playfair Display', serif; font-size: clamp(18px, 4.5vw, 26px); font-style: italic; color: var(--gold-light); line-height: 1.6; max-width: 520px; margin: 0 auto; animation: fadeUp 0.8s ease forwards; }
+
+  /* ─── FINAL ─── */
+  #final { max-width: 100%; padding: 100px 24px 120px; text-align: center; background: var(--bg2); border-top: 1px solid var(--white-faint); }
+  .final-inner { max-width: 520px; margin: 0 auto; }
+  .final-letter { font-size: clamp(16px, 4vw, 20px); line-height: 2; font-weight: 300; color: var(--white-dim); font-style: italic; margin-bottom: 60px; text-align: left; padding: 40px 32px; border-left: 1px solid var(--gold); position: relative; }
+  .final-letter::before { content: '"'; font-family: 'Playfair Display', serif; font-size: 120px; color: var(--gold); opacity: 0.12; position: absolute; top: -20px; left: 16px; line-height: 1; }
+  .final-letter strong { color: var(--gold-light); font-weight: 600; font-style: normal; }
+  .decision-box { border: 1px solid rgba(201,169,110,0.3); padding: 40px 24px; position: relative; margin-bottom: 32px; }
+  .decision-box::before { content: ''; position: absolute; inset: 4px; border: 1px solid var(--gold-dim); pointer-events: none; }
+  .decision-text { font-size: clamp(15px, 3.8vw, 18px); line-height: 1.8; color: var(--white-dim); margin-bottom: 32px; font-weight: 300; }
+  .decision-text em { color: var(--gold-light); font-style: italic; }
+  .cta-btn { display: inline-block; padding: 18px 40px; background: transparent; border: 1px solid var(--gold); color: var(--gold); font-family: 'Cormorant Garamond', serif; font-size: 14px; letter-spacing: 0.35em; text-transform: uppercase; cursor: pointer; position: relative; overflow: hidden; transition: color 0.4s ease; }
+  .cta-btn::before { content: ''; position: absolute; inset: 0; background: var(--gold); transform: translateX(-101%); transition: transform 0.4s ease; z-index: 0; }
+  .cta-btn:hover::before { transform: translateX(0); }
+  .cta-btn:hover { color: var(--bg); }
+  .cta-btn span { position: relative; z-index: 1; }
+  .accepted-msg { display: none; flex-direction: column; align-items: center; gap: 24px; padding: 40px 0; animation: fadeUp 1s ease forwards; }
+  .accepted-icon { font-family: 'Playfair Display', serif; font-size: 48px; color: var(--gold); }
+  .accepted-text { font-family: 'Playfair Display', serif; font-size: clamp(20px, 5vw, 28px); font-style: italic; color: var(--white); line-height: 1.5; }
+  .accepted-sub { font-size: 13px; letter-spacing: 0.3em; color: var(--gold); text-transform: uppercase; }
+
+  footer { text-align: center; padding: 40px 24px; font-size: 11px; letter-spacing: 0.3em; color: rgba(245,240,232,0.12); text-transform: uppercase; position: relative; z-index: 1; }
+
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes scrollPulse { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
+
+  body::after {
+    content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 999; opacity: 0.025;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 200px;
+  }
+
+  #cursor-glow { position: fixed; width: 300px; height: 300px; border-radius: 50%; background: radial-gradient(circle, rgba(201,169,110,0.04) 0%, transparent 70%); pointer-events: none; transform: translate(-50%, -50%); z-index: 2; }
+</style>
+</head>
+<body>
+
+<div id="progress-bar"></div>
+<div id="cursor-glow"></div>
+<canvas id="particles"></canvas>
+
+<!-- YouTube hidden player container -->
+<div id="yt-container"><div id="yt-player"></div></div>
+
+<!-- Fixed music button -->
+<div id="music-btn" onclick="toggleMusic()">
+  <div class="ring"></div>
+  <svg id="ico-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+  <svg id="ico-pause" viewBox="0 0 24 24" style="display:none"><path d="M6 19h4V5H6zm8-14v14h4V5z"/></svg>
+</div>
+<div class="music-label" id="music-label">Só sei dançar com você</div>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-eyebrow">Uma história improvável</div>
+  <div class="hero-monogram">E<span class="hero-amp">&</span>A</div>
+  <div class="hero-divider"></div>
+  <div class="hero-tagline">De todos os caminhos improváveis…<br><em>eu encontrei você.</em></div>
+  <div class="hero-date">Novembro de 2025 — e o que vier depois</div>
+
+  <div class="hero-music-cta" id="hero-play" onclick="startMusic()">
+    <div class="play-circle">
+      <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+    </div>
+    <span class="play-label">Tocar nossa música</span>
+  </div>
+
+  <div class="scroll-hint">
+    <span>Continuar</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- ABERTURA -->
+<section id="opening">
+  <span class="section-label reveal">Como tudo começa</span>
+  <h2 class="section-title reveal reveal-delay-1">Uma conexão que<br>não <em>deveria</em><br>ter acontecido.</h2>
+  <div class="gold-rule reveal reveal-delay-2"></div>
+  <p class="section-body reveal reveal-delay-2">Não havia amigos em comum. Nenhuma rotina parecida. Nenhum ciclo social compartilhado. Nenhuma razão óbvia para que dois caminhos se cruzassem.</p>
+  <p class="section-body reveal reveal-delay-3" style="margin-top:24px">E ainda assim, em um treino de vôlei qualquer, <strong>no dia 2 de novembro de 2025</strong>, algo mudou de lugar dentro de mim — e eu nem sabia ainda.</p>
+  <p class="section-body reveal reveal-delay-4" style="margin-top:24px">Ela foi levada pela mãe. <em>Eu pedi o número para a mãe.</em> Assim começou tudo — de um jeito torto, nervoso, completamente meu.</p>
+</section>
+
+<!-- TIMELINE -->
+<div id="timeline">
+  <div class="timeline-inner">
+    <span class="section-label reveal">Linha do tempo</span>
+    <h2 class="section-title reveal reveal-delay-1">Cada data<br>tem um <em>peso</em>.</h2>
+    <p class="section-body reveal reveal-delay-2">Não são apenas dias no calendário. São marcos de uma história que foi sendo escrita devagar — e com cuidado.</p>
+    <div class="timeline-track">
+
+      <div class="tl-item">
+        <div class="tl-dot-wrap"><div class="tl-dot"></div></div>
+        <div class="tl-content">
+          <div class="tl-date">02 nov 2025</div>
+          <div class="tl-title">O primeiro olhar</div>
+          <p class="tl-text">Um treino de vôlei. Ela apareceu. Eu olhei. <em>Não consegui mais parar de olhar.</em> Pedi o número pra mãe dela como se isso fosse a coisa mais natural do mundo — e na hora parecia, sim.</p>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot-wrap"><div class="tl-dot"></div></div>
+        <div class="tl-content">
+          <div class="tl-date">Primeiros dias</div>
+          <div class="tl-title">A dualidade</div>
+          <p class="tl-text">Por mensagem ela parecia distante. Pessoalmente havia conexão real. <em>Frieza digital vs presença que aquecia.</em> Aquela tensão me intrigava mais do que qualquer resposta direta teria feito.</p>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot-wrap"><div class="tl-dot"></div></div>
+        <div class="tl-content">
+          <div class="tl-date">08 nov 2025</div>
+          <div class="tl-title">Vôlei que não era sobre vôlei</div>
+          <p class="tl-text">Fui jogar vôlei. Eu, que não gosto de vôlei. A desculpa era o esporte. O motivo real era ela. Ela me ensinou com paciência e carisma — e transformou algo que eu não curtia <em>em algo que eu vou lembrar sempre.</em></p>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot-wrap"><div class="tl-dot"></div></div>
+        <div class="tl-content">
+          <div class="tl-date">nov — dez 2025</div>
+          <div class="tl-title">Os treinos que eu esperava</div>
+          <p class="tl-text">Passei a ir só pra ver ela jogar. Os saltos. Os ataques. <em>O cabelo dourado quase flutuando no ar.</em> Coisas que eu guardava sem perceber que estava guardando.</p>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot-wrap"><div class="tl-dot"></div></div>
+        <div class="tl-content">
+          <div class="tl-date">11 jan 2026</div>
+          <div class="tl-title">Parque Florestal</div>
+          <p class="tl-text">Primeiro encontro. Leveza total. Risos fáceis. Animais no caminho. O mapa nos levou pro lugar errado — acabamos no shopping, comemos hambúrguer, andamos até não ter mais perna. <em>Foi perfeito exatamente porque foi torto.</em> Nesse dia percebi que ela poderia estar interessada em mim. Parecia impossível. E era real.</p>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot-wrap"><div class="tl-dot"></div></div>
+        <div class="tl-content">
+          <div class="tl-date">11 abr 2026</div>
+          <div class="tl-title">O beijo</div>
+          <p class="tl-text">Cinema. Poltronas VIP. Um balde gigante de pipoca que comemos inteiro. Ficamos grudados. <em>O beijo foi curto, nervoso, com frio na barriga de verdade.</em> Mas o que ficou mesmo foi o calor dela. O cheiro dela. A sensação de que aquilo era novo e já era familiar ao mesmo tempo.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- STATS -->
+<div id="stats">
+  <div class="stats-inner">
+    <span class="section-label reveal">Em números</span>
+    <h2 class="section-title reveal reveal-delay-1">Uma história<br>que <em>conta</em>.</h2>
+    <div class="stats-grid">
+      <div class="stat-card reveal">
+        <span class="stat-number" data-target="168" data-suffix="">0</span>
+        <span class="stat-label">dias desde o primeiro olhar</span>
+      </div>
+      <div class="stat-card reveal reveal-delay-1">
+        <span class="stat-number" data-target="90" data-suffix="+">0</span>
+        <span class="stat-label">dias juntos</span>
+      </div>
+      <div class="stat-card reveal reveal-delay-2">
+        <span class="stat-number" data-target="1" data-suffix="">0</span>
+        <span class="stat-label">encontro que mudou tudo</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- EMOCIONAL -->
+<section id="emotional">
+  <span class="section-label reveal">O que não cabe em data</span>
+  <h2 class="section-title reveal reveal-delay-1">Tempo não é<br>quantidade.<br>É <em>escolha</em>.</h2>
+  <div class="gold-rule reveal reveal-delay-2"></div>
+  <p class="section-body reveal reveal-delay-2">Nossa rotina é intensa. O tempo é escasso. Nos vemos pouco — e isso é uma realidade que a gente não finge que não existe.</p>
+  <p class="section-body reveal reveal-delay-3" style="margin-top:24px">Mas dentro dessa realidade, <strong>a gente escolhe estar junto</strong>. Não porque é fácil. Porque vale. Existe uma maturidade nessa escolha que eu admiro tanto nela — ela entende limitações sem transformá-las em cobranças. Constrói dentro do que é possível.</p>
+
+  <div class="pull-quote reveal">
+    Tem coisas que o tempo não mede.<br>
+    A intensidade de um <em>momento certo</em>, por exemplo.
+  </div>
+
+  <p class="section-body reveal">Ela é engraçada e carismática. Pode ser delicada ou intensa, extrovertida ou introvertida — um espectro inteiro de personalidade em uma pessoa só. As bochechas ficam vermelhas quando sorri. <em>Isso me mata toda vez.</em></p>
+  <p class="section-body reveal" style="margin-top:24px">Ela joga vôlei e ganha campeonatos. Ela disse "eu te amo" depois de receber uma carta minha. Eu chamo ela de <strong>Meu Bem</strong> — não porque era o apelido mais original, mas porque é o que ela é.</p>
+</section>
+
+<!-- FUTURO -->
+<div id="future">
+  <div class="future-inner">
+    <span class="section-label reveal">Um dia</span>
+    <h2 class="section-title reveal reveal-delay-1">O futuro que<br>posso <em>imaginar</em><br>com você.</h2>
+    <p class="section-body reveal reveal-delay-2">Não é promessa. Não é pressão. É uma visão — a mais bonita que eu consigo ter quando fecho os olhos e projeto o que pode ser construído com calma, com intenção, com as duas mãos.</p>
+
+    <div class="future-scene reveal">
+      <p>Uma casa com identidade. <strong>Bonita, elegante, nossa.</strong> Cheia de plantas. Uma cozinha grande com ilha — onde a gente cozinha junto ou pelo menos finge que vai cozinhar. Armários cheios de guloseimas, porque ela precisa engordinha.</p>
+      <p>Um quarto com conforto de verdade. Eu fazendo cafuné nela enquanto ela dorme — porque ela vai dormir cedo e eu vou ficar acordado olhando pra ela como um tonto.</p>
+      <p>Quintal com árvores frutíferas. <em>Pitbulls filhotes correndo</em> de um lado para o outro. A cachorrinha dela mais velha, descansando com a dignidade de quem viveu muito bem.</p>
+      <p><strong>Clima de Chapada dos Guimarães.</strong> Vista bonita. Silêncio do tipo que descansa. As fotos que tiramos pelo mundo espalhadas pelas paredes — China, Uruguai, Berlim, Canadá, Suíça.</p>
+      <p>Ela: <em>médica formada, realizada.</em> Eu: carreira consolidada, orgulhoso dela todo dia. Dois adultos que escolheram ser parceiros — de vida, de sonho, de hambúrguer às 23h quando o mapa errar de novo.</p>
+    </div>
+
+    <div class="future-note reveal">
+      O futuro não está definido.<br>Mas pode ser <em>construído junto</em>.
+    </div>
+  </div>
+</div>
+
+<!-- EASTER EGG -->
+<div id="easter-trigger">
+  <div class="easter-symbol" id="easter-symbol">✦</div>
+  <span class="easter-hint" id="easter-hint">toque algumas vezes</span>
+  <div class="easter-msg" id="easter-msg">"Se o tempo tivesse consciência…<br>ele teria orgulho da gente."</div>
+</div>
+
+<!-- FINAL -->
+<div id="final">
+  <div class="final-inner">
+    <span class="section-label reveal">Para você</span>
+    <div class="final-letter reveal">
+      <p>Agatha,</p><br>
+      <p>Não escrevi isso pra impressionar. Escrevi porque você merece ver — em palavras organizadas, com espaço pra respirar — o que você representa pra mim.</p><br>
+      <p>Cada treino que fui por causa de você. Cada mensagem que eu reli três vezes antes de mandar. Cada vez que o tempo que temos parece pouco e ainda assim parece <strong>exatamente suficiente</strong>.</p><br>
+      <p>Eu não sei o que o futuro vai ser. Mas sei que <em>você é a parte que eu escolho.</em></p><br>
+      <p>Com amor — o tipo que constrói devagar e dura muito.</p><br>
+      <p style="color:var(--gold);font-style:normal;letter-spacing:0.1em">Eduardo</p>
+    </div>
+
+    <div class="decision-box reveal">
+      <p class="decision-text">Não existe pressão aqui. Só uma pergunta simples, com a resposta mais importante que uma página pode receber.<br><br><em>"Eu, Agatha, aceito continuar construindo isso… no nosso tempo."</em></p>
+      <button class="cta-btn" id="cta-btn" onclick="handleAccept()">
+        <span>Continuar escrevendo essa história</span>
+      </button>
+    </div>
+
+    <div class="accepted-msg" id="accepted-msg">
+      <div class="accepted-icon">♡</div>
+      <div class="accepted-text">"Então que venha tudo<br>— no nosso tempo."</div>
+      <div class="accepted-sub">E + A — agora e o que vier</div>
+    </div>
+  </div>
+</div>
+
+<footer>E + A · 2025–∞ · Uma história que não deveria ter começado — e não quer parar.</footer>
+
+<script>
+// ─── YOUTUBE IFrame API ───
+// Só Sei Dançar Com Você — Tulipa Ruiz (lançamento oficial Altafonte / YB Music)
+const VIDEO_ID = 'N3Tp4a8mV7k';
+let player, playerReady = false, isPlaying = false, pendingPlay = false;
+
+function onYouTubeIframeAPIReady() {
+  player = new YT.Player('yt-player', {
+    height: '1', width: '1',
+    videoId: VIDEO_ID,
+    playerVars: { autoplay: 0, controls: 0, loop: 1, playlist: VIDEO_ID, rel: 0, iv_load_policy: 3, modestbranding: 1 },
+    events: {
+      onReady(e) {
+        playerReady = true;
+        e.target.setVolume(65);
+        if (pendingPlay) { e.target.playVideo(); pendingPlay = false; }
+      },
+      onStateChange(e) {
+        if (e.data === YT.PlayerState.PLAYING) { isPlaying = true; setUI(true); }
+        else if (e.data === YT.PlayerState.PAUSED || e.data === YT.PlayerState.ENDED) { isPlaying = false; setUI(false); }
+      }
+    }
+  });
+}
+
+function setUI(playing) {
+  const btn = document.getElementById('music-btn');
+  document.getElementById('ico-play').style.display = playing ? 'none' : 'block';
+  document.getElementById('ico-pause').style.display = playing ? 'block' : 'none';
+  btn.classList.toggle('playing', playing);
+  document.getElementById('music-label').classList.toggle('show', playing);
+}
+
+function startMusic() {
+  const heroBtn = document.getElementById('hero-play');
+  heroBtn.classList.add('hidden');
+  if (playerReady) player.playVideo();
+  else pendingPlay = true;
+}
+
+function toggleMusic() {
+  if (!playerReady) { startMusic(); return; }
+  isPlaying ? player.pauseVideo() : player.playVideo();
+}
+
+// ─── PARTICLES ───
+(function() {
+  const c = document.getElementById('particles'), ctx = c.getContext('2d');
+  let W, H, pts = [];
+  function resize() { W = c.width = innerWidth; H = c.height = innerHeight; }
+  resize(); addEventListener('resize', resize);
+  class P {
+    constructor() { this.reset(); }
+    reset() { this.x = Math.random()*W; this.y = Math.random()*H; this.r = Math.random()*1.2+0.3; this.speed = Math.random()*0.25+0.05; this.a = Math.random()*0.5+0.1; this.d = Math.random()*Math.PI*2; }
+    tick() { this.x += Math.cos(this.d)*this.speed; this.y += Math.sin(this.d)*this.speed-0.12; this.a -= 0.0008; if(this.a<=0||this.y<-10) this.reset(); }
+  }
+  for(let i=0;i<60;i++) pts.push(new P());
+  (function draw(){
+    ctx.clearRect(0,0,W,H);
+    for(let p of pts){ p.tick(); ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fillStyle=`rgba(201,169,110,${p.a})`; ctx.fill(); }
+    requestAnimationFrame(draw);
+  })();
+})();
+
+// ─── CURSOR GLOW ───
+const glow = document.getElementById('cursor-glow');
+addEventListener('mousemove', e => { glow.style.left=e.clientX+'px'; glow.style.top=e.clientY+'px'; });
+
+// ─── PROGRESS BAR ───
+addEventListener('scroll', () => {
+  document.getElementById('progress-bar').style.width = ((scrollY/(document.body.scrollHeight-innerHeight))*100)+'%';
+});
+
+// ─── INTERSECTION OBSERVER ───
+const io = new IntersectionObserver(entries => entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); }), { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+document.querySelectorAll('.reveal,.tl-item,.stat-card').forEach(el => io.observe(el));
+
+// ─── COUNTERS ───
+function animCounter(el) {
+  const target = +el.dataset.target, suffix = el.dataset.suffix||'';
+  let s=0;
+  (function step(ts){ if(!s) s=ts; const p=Math.min((ts-s)/1800,1), ease=1-Math.pow(1-p,3); el.textContent=Math.floor(ease*target)+suffix; if(p<1) requestAnimationFrame(step); })(0);
+}
+new IntersectionObserver(entries => entries.forEach(e => { if(e.isIntersecting&&!e.target.dataset.done){ e.target.dataset.done=1; e.target.querySelectorAll('.stat-number').forEach(animCounter); } }), {threshold:0.3}).observe(document.getElementById('stats'));
+
+// ─── EASTER EGG ───
+let clicks=0;
+document.getElementById('easter-trigger').addEventListener('click', () => {
+  clicks++;
+  const s=document.getElementById('easter-symbol');
+  s.style.transform=`scale(${1+clicks*0.05}) rotate(${clicks*15}deg)`;
+  s.style.opacity=Math.min(0.3+clicks*0.1,1);
+  const h=document.getElementById('easter-hint');
+  if(clicks===3) h.textContent='continue...';
+  if(clicks===5) h.textContent='quase lá...';
+  if(clicks>=7){ s.style.display='none'; h.style.display='none'; document.getElementById('easter-msg').style.display='block'; }
+});
+
+// ─── ACCEPT ───
+function handleAccept() {
+  const btn=document.getElementById('cta-btn'), box=document.querySelector('.decision-box'), msg=document.getElementById('accepted-msg');
+  btn.style.cssText='pointer-events:none;opacity:0;transition:all .4s ease';
+  setTimeout(()=>{ box.style.cssText='opacity:0;transform:translateY(-10px);transition:all .5s ease'; },200);
+  setTimeout(()=>{ box.style.display='none'; msg.style.display='flex'; const p=document.getElementById('particles'); p.style.opacity='0.9'; setTimeout(()=>p.style.opacity='0.4',2500); },700);
+}
+</script>
+<script src="https://www.youtube.com/iframe_api"></script>
+</body>
+</html>
